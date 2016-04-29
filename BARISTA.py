@@ -79,6 +79,7 @@ class game():
         self.chosen = False         #a bool to say whether a shape has been chosen
         self.Drawing =None          #an object which is the picture
         self.killShape = False
+        self.score = 0
     def DrawOnScreen(self):
         header = "just start pouring!!"
         text = self.headerFont.render((header.title()), True, colours.burgandy)
@@ -106,13 +107,16 @@ class game():
             if event.key == pygame.K_UP:
                 self.upCount +=1
             if event.key == pygame.K_DOWN:
-                 self.downCount +=1
+                self.downCount +=1
             if event.key == pygame.K_LEFT:
-                 self.leftCount +=1
+                self.leftCount +=1
             if event.key == pygame.K_RIGHT:
-                 self.rightCount +=1
+                self.rightCount +=1
             if event.key == pygame.K_RETURN:
-                start()
+                self.chosen = False         #a bool to say whether a shape has been chosen
+                self.Drawing =None          #an object which is the picture
+                self.killShape = False
+ 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_UP:
                 self.upCount = 0
@@ -137,6 +141,13 @@ class game():
     def makechanges(self):
         self.Drawing.sequence(self.upCount, self.downCount, self.rightCount, self.leftCount)
         self.DrawOnScreen()
+        if self.Drawing.stage == self.Drawing.maxStage:
+            self.score -= self.Drawing.mistakes
+            if self.Drawing.mistakes == 0:
+                self.score  += 100
+            elif self.Drawing.mistakes <self.Drawing.maxStage//2:
+                self.score +=50
+        print(self.score ,"you made", self.Drawing.mistakes, "mistakes")
         if self.killShape == True:
             self.Drawing.newGame()
             self.startup()
@@ -150,14 +161,14 @@ class game():
     def loop(self):
         self.startup()
         while self.running == True:
+            for event in pygame.event.get():
+                self.eventHandle(event)     #event handling.
             if self.chosen == False:
                 chooseShape.drawOnScreen(self.window)
             else:
-                self.Drawing.checkStage()
-                self.makechanges() # draw
-            for event in pygame.event.get():
-                self.eventHandle(event)
-            self.refresh()
+                self.Drawing.checkStage()   #give me the right image
+                self.makechanges()          # draw text and the image onto the screen
+            self.refresh()                  #show the changes on the screen
             clock.tick(20)
 myGame = game()
 myGame.loop()

@@ -9,6 +9,8 @@ class colours():
 class shape():
     stage0 = pygame.image.load("stage0.jpg")
     maxStage = 10
+    mistakes = 0
+    misCount = 0
     def __init__(self):
         self.image =shape.stage0
         self.showing = "stage0"
@@ -29,8 +31,15 @@ class shape():
         if d ==l==r==u ==0 and self.stage>= self.maxStage:
             self.updateStage()
         if self.stage > self.maxStage + 30:
-            self.stage= 0
-        print(self.stage)
+            print("your score for that was" + str(self.mistakes))
+            self.__init__()
+            self.newGame()
+
+        self.misCount +=1
+        if self.misCount >100:
+            self.misCount  = 0
+            print("new count")
+        
 class Heart(shape):
     stages= []
     stages.append("first hold down the up key")
@@ -59,12 +68,20 @@ class Heart(shape):
             self.showing = "stage3"
     def sequence(self, upCount, downCount,r,l):
         super().sequence(upCount,downCount,r,l)
-        if upCount == 10:
+        if self.stage == 0 and upCount == 10:
             self.updateStage()
         elif downCount ==15 and self.stage == 1:
             self.updateStage()
         elif downCount == 0 and self.stage== 2:
             self.updateStage()
+        if self.misCount == 0:
+            if self.stage == 0 and [downCount !=0 or r != 0 or l !=0]:
+                self.mistakes +=1
+            elif self.stage ==1 and [upCount !=0 or r != 0 or l !=0]:
+                self.mistakes +=1
+            elif self.stage == 2 and [upCount !=0 or downCount !=0 or r != 0 or l !=0]:
+                self.mistakes +=1
+                
 class Leaf(shape):
     stage1= pygame.image.load("leaf1.jpg")
     stage2= pygame.image.load("leaf2.jpg")
@@ -114,19 +131,37 @@ class Leaf(shape):
 
     def sequence(self, u,d,r,l):
         super().sequence(u,d,r,l)
-        if u == 10:
-            self.updateStage()
-        elif l ==10 and self.stage == 1:
-            self.updateStage()
-        elif r == 20 and self.stage == 2:
-            self.updateStage()
-        elif l == 20 and self.stage == 3:
-            self.updateStage()
-        elif r == 20 and self.stage ==4:
-            self.updateStage()
-        elif d == 50 and self.stage == 5:
-            self.updateStage()
-        elif d ==l==r==u ==0 and self.stage>= 6:
-            self.updateStage()
+
+        if self.stage ==0: 
+            if u == 10:
+                self.updateStage()
+            elif [d>0 or r>0 or l>0] and self.misCount == 0:
+                self.mistakes +=1
+
+        elif self.stage == 1 or self.stage == 3:
+            if l == 10:
+                self.updateStage()
+            elif [u>0 or r>0 or l>0] and self.misCount == 0:
+                self.mistakes +=1
+                
+        elif self.stage == 2 or self.stage == 4:
+            if r == 10:
+                self.updateStage()
+            elif [u>0 or d>0 or l>0] and self.misCount == 0:
+                self.mistakes +=1
+
+        elif self.stage == 5:
+            if d == 50:
+                self.updateStage()
+            elif [u>0 or d>0 or l>0] and self.misCount == 0:
+                self.mistakes +=1
+                
+        elif self.stage>= 6:
+            if d ==l==r==u ==0:
+                self.updateStage()
+            elif self.misCount == 0:
+                self.mistakes +=1
+                #_______________
         elif self.stage ==20:
             self.stage= 0
+ 
